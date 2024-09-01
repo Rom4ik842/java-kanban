@@ -86,6 +86,29 @@ public class TaskManager {
         }
     }
 
+    // Удаление всех задач
+    public void deleteAllTasks() {
+        tasks.clear();
+    }
+
+    // Удаление всех эпиков
+    public void deleteAllEpics() {
+        for (Epic epic : epics.values()) {
+            for (Subtask subtask : epic.getSubtasks()) {
+                subtasks.remove(subtask.getId());
+            }
+        }
+        epics.clear();
+    }
+
+    // Удаление всех подзадач
+    public void deleteAllSubtasks() {
+        for (Subtask subtask : subtasks.values()) {
+            subtask.getEpic().removeSubtask(subtask);
+        }
+        subtasks.clear();
+    }
+
     // Обновление задачи
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
@@ -99,7 +122,7 @@ public class TaskManager {
     public void updateEpic(Epic epic) {
         if (epics.containsKey(epic.getId())) {
             epics.put(epic.getId(), epic);
-            epic.updateStatus();
+            epic.updateStatus(); // Пересчитываем статус эпика при обновлении
         } else {
             throw new IllegalArgumentException("Эпик с ID " + epic.getId() + " не существует.");
         }
@@ -109,14 +132,19 @@ public class TaskManager {
     public void updateSubtask(Subtask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
             subtasks.put(subtask.getId(), subtask);
-            subtask.getEpic().updateStatus();
+            subtask.getEpic().updateStatus(); // Пересчитываем статус эпика при обновлении подзадачи
         } else {
             throw new IllegalArgumentException("Подзадача с ID " + subtask.getId() + " не существует.");
         }
     }
 
-    // Получение списка подзадач для эпика
-    public List<Subtask> getSubtasksOfEpic(Epic epic) {
-        return List.copyOf(epic.getSubtasks());
+    // Получение списка подзадач для эпика по ID
+    public List<Subtask> getSubtasksOfEpic(int epicId) {
+        Epic epic = getEpicById(epicId);
+        if (epic != null) {
+            return new ArrayList<>(epic.getSubtasks()); // Возвращаем копию списка подзадач
+        } else {
+            throw new IllegalArgumentException("Эпик с ID " + epicId + " не существует.");
+        }
     }
 }

@@ -6,10 +6,16 @@ public class Task {
     private int id;
     protected Status status;
 
-    public Task(String title, String description) {
+    // Конструктор задачи с возможностью задать статус
+    public Task(String title, String description, Status status) {
         this.title = title;
         this.description = description;
-        this.status = Status.NEW;  // По умолчанию статус - "NEW"
+        this.status = status;
+    }
+
+    // Конструктор задачи с статусом по умолчанию
+    public Task(String title, String description) {
+        this(title, description, Status.NEW);  // По умолчанию статус - "NEW"
     }
 
     // Геттеры и сеттеры
@@ -25,8 +31,16 @@ public class Task {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Status getStatus() {
@@ -48,5 +62,15 @@ public class Task {
     @Override
     public int hashCode() {
         return Integer.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
     }
 }
