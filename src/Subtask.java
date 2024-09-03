@@ -1,10 +1,15 @@
-// Класс Subtask наследует базовые свойства и методы от класса Task
-// и представляет собой подзадачу, связанную с определенным Epic.
 public class Subtask extends Task {
-    private Epic epic; // Исправлено: вместо идентификатора эпика будет объект Epic
+    private Epic epic; // Связь с эпиком
 
+    // Конструктор по умолчанию с статусом NEW
     public Subtask(String title, String description, Epic epic) {
-        super(title, description);
+        super(title, description, Status.NEW);
+        this.epic = epic;
+    }
+
+    // Новый конструктор, позволяющий задать статус
+    public Subtask(String title, String description, Status status, Epic epic) {
+        super(title, description, status);
         this.epic = epic;
     }
 
@@ -23,7 +28,7 @@ public class Subtask extends Task {
                 ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
-                ", epic=" + epic.getTitle() + // Пример использования
+                ", epic=" + getEpic().getTitle() +
                 '}';
     }
 }

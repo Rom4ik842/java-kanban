@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-// Класс Epic наследует базовые свойства и методы от класса Task
-// и представляет собой крупную задачу, которая может содержать несколько подзадач (Subtask).
 public class Epic extends Task {
     private final List<Subtask> subtasks = new ArrayList<>();
 
@@ -12,7 +10,7 @@ public class Epic extends Task {
     }
 
     public List<Subtask> getSubtasks() {
-        return List.copyOf(subtasks);
+        return subtasks; // Возвращаем оригинальный список
     }
 
     public void addSubtask(Subtask subtask) {
@@ -32,11 +30,15 @@ public class Epic extends Task {
         }
 
         boolean allDone = true;
-        boolean inProgress = false;
+        boolean hasInProgress = false;
+        boolean hasNew = false;
 
         for (Subtask subtask : subtasks) {
             if (subtask.getStatus() == Status.IN_PROGRESS) {
-                inProgress = true;
+                hasInProgress = true;
+            }
+            if (subtask.getStatus() == Status.NEW) {
+                hasNew = true;
             }
             if (subtask.getStatus() != Status.DONE) {
                 allDone = false;
@@ -45,11 +47,21 @@ public class Epic extends Task {
 
         if (allDone) {
             this.status = Status.DONE;
-        } else if (inProgress) {
+        } else if (hasInProgress || (hasNew && !allDone)) {
             this.status = Status.IN_PROGRESS;
         } else {
             this.status = Status.NEW;
         }
     }
-}
 
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "id=" + getId() +
+                ", title='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getStatus() +
+                ", subtasks=" + subtasks +
+                '}';
+    }
+}

@@ -91,22 +91,14 @@ public class TaskManager {
         tasks.clear();
     }
 
-    // Удаление всех эпиков
-    public void deleteAllEpics() {
-        for (Epic epic : epics.values()) {
-            for (Subtask subtask : epic.getSubtasks()) {
-                subtasks.remove(subtask.getId());
-            }
-        }
-        epics.clear();
-    }
-
     // Удаление всех подзадач
     public void deleteAllSubtasks() {
-        for (Subtask subtask : subtasks.values()) {
-            subtask.getEpic().removeSubtask(subtask);
-        }
         subtasks.clear();
+    }
+
+    // Удаление всех эпиков
+    public void deleteAllEpics() {
+        epics.clear();
     }
 
     // Обновление задачи
@@ -121,8 +113,7 @@ public class TaskManager {
     // Обновление эпика
     public void updateEpic(Epic epic) {
         if (epics.containsKey(epic.getId())) {
-            epics.put(epic.getId(), epic);
-            epic.updateStatus(); // Пересчитываем статус эпика при обновлении
+            epics.put(epic.getId(), epic); // Заменяем старый эпик на новый
         } else {
             throw new IllegalArgumentException("Эпик с ID " + epic.getId() + " не существует.");
         }
@@ -142,7 +133,7 @@ public class TaskManager {
     public List<Subtask> getSubtasksOfEpic(int epicId) {
         Epic epic = getEpicById(epicId);
         if (epic != null) {
-            return new ArrayList<>(epic.getSubtasks()); // Возвращаем копию списка подзадач
+            return epic.getSubtasks(); // Возвращаем оригинальный список подзадач
         } else {
             throw new IllegalArgumentException("Эпик с ID " + epicId + " не существует.");
         }
