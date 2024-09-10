@@ -1,9 +1,24 @@
+package com.yandex.app;
+
+import com.yandex.app.model.Epic;
+import com.yandex.app.model.Status;
+import com.yandex.app.model.Subtask;
+import com.yandex.app.model.Task;
+import com.yandex.app.service.HistoryManager;
+import com.yandex.app.service.InMemoryHistoryManager;
+import com.yandex.app.service.InMemoryTaskManager;
+import com.yandex.app.service.TaskManager;
+
 public class Main {
     public static void main(String[] args) {
-        TaskManager manager = new TaskManager();
+        // Создаем экземпляр HistoryManager
+        HistoryManager historyManager = new InMemoryHistoryManager();
+
+        // Создаем экземпляр InMemoryTaskManager, передавая HistoryManager в конструктор
+        TaskManager manager = new InMemoryTaskManager(historyManager);
 
         // Создание задач, эпиков и подзадач
-        Task task1 = new Task("Переезд", "Собрать коробки, упаковать кошку, сказать слова прощания");
+        Task task1 = new Task("Переезд", "Собрать коробки, упаковать кошку, сказать слова прощания", Status.NEW);
         manager.addTask(task1);
 
         Epic epic1 = new Epic("Важный эпик 2", "Описание эпика 2");
@@ -62,5 +77,14 @@ public class Main {
 
         System.out.println("Список всех подзадач:");
         System.out.println(manager.getAllSubtasks());
+
+        // Просмотр задач для проверки истории
+        manager.getTaskById(task1.getId());
+        manager.getEpicById(epic1.getId());
+        manager.getSubtaskById(subtask1.getId());
+
+        // Вывод истории просмотров
+        System.out.println("История просмотров:");
+        System.out.println(manager.getHistory());
     }
 }
