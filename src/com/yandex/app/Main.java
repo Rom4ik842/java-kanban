@@ -5,17 +5,17 @@ import com.yandex.app.model.Status;
 import com.yandex.app.model.Subtask;
 import com.yandex.app.model.Task;
 import com.yandex.app.service.HistoryManager;
-import com.yandex.app.service.InMemoryHistoryManager;
-import com.yandex.app.service.InMemoryTaskManager;
+import com.yandex.app.service.Managers;
 import com.yandex.app.service.TaskManager;
 
 public class Main {
     public static void main(String[] args) {
-        // Создаем экземпляр HistoryManager
-        HistoryManager historyManager = new InMemoryHistoryManager();
+        // Используем фабрику для получения объекта HistoryManager
+        HistoryManager historyManager = Managers.getDefaultHistory();
 
-        // Создаем экземпляр InMemoryTaskManager, передавая HistoryManager в конструктор
-        TaskManager manager = new InMemoryTaskManager(historyManager);
+        // Используем фабрику для получения объекта TaskManager
+        TaskManager manager = Managers.getDefault();
+
 
         // Создание задач, эпиков и подзадач
         Task task1 = new Task("Переезд", "Собрать коробки, упаковать кошку, сказать слова прощания", Status.NEW);
@@ -83,8 +83,22 @@ public class Main {
         manager.getEpicById(epic1.getId());
         manager.getSubtaskById(subtask1.getId());
 
+        // Создаем 11 задач и добавляем их в историю
+        for (int i = 1; i <= 11; i++) {
+            Task task = new Task("Задача " + i, "Описание задачи " + i, Status.NEW);
+            manager.addTask(task);
+            manager.getTaskById(task.getId());
+        }
+
         // Вывод истории просмотров
         System.out.println("История просмотров:");
         System.out.println(manager.getHistory());
+
+        // Проверка, что в истории не более 10 элементов
+        if (manager.getHistory().size() <= 10) {
+            System.out.println("История содержит не более 10 элементов, как и ожидалось.");
+        } else {
+            System.out.println("Ошибка: История содержит более 10 элементов.");
+        }
     }
 }

@@ -16,7 +16,8 @@ class InMemoryTaskManagerTest {
 
     @BeforeEach
     void setUp() {
-        manager = new InMemoryTaskManager(new InMemoryHistoryManager()); // Исправление здесь
+        // Используем фабрику для получения объекта TaskManager
+        manager = Managers.getDefault();
     }
 
     @Test

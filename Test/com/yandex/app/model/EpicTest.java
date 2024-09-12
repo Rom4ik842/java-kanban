@@ -1,15 +1,22 @@
 package com.yandex.app.model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class EpicTest {
+    private Epic epic1;
+    private Epic epic2;
+
+    @BeforeEach
+    void setUp() {
+        epic1 = new Epic("Эпик 1", "Описание 1");
+        epic2 = new Epic("Эпик 2", "Описание 2");
+    }
 
     @Test
     void testEquals() {
-        Epic epic1 = new Epic("Эпик 1", "Описание 1");
-        Epic epic2 = new Epic("Эпик 2", "Описание 2");
         epic1.setId(1);
         epic2.setId(1);
 
@@ -18,8 +25,6 @@ class EpicTest {
 
     @Test
     void testNotEquals() {
-        Epic epic1 = new Epic("Эпик 1", "Описание 1");
-        Epic epic2 = new Epic("Эпик 2", "Описание 2");
         epic1.setId(1);
         epic2.setId(2);
 
@@ -28,7 +33,9 @@ class EpicTest {
 
     @Test
     void testAddSubtaskToSelf() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        assertThrows(IllegalArgumentException.class, () -> epic.addSubtask(new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic)));
+        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            epic1.addSubtask(subtask);
+        });
     }
 }
