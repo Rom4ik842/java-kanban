@@ -33,6 +33,7 @@ public class Subtask extends Task {
                 ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
+                ", epicId=" + (epic != null ? epic.getId() : "null") +
                 '}';
     }
 }
