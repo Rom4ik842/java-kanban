@@ -16,7 +16,6 @@ public class Main {
         // Используем фабрику для получения объекта TaskManager
         TaskManager manager = Managers.getDefault();
 
-
         // Создание задач, эпиков и подзадач
         Task task1 = new Task("Переезд", "Собрать коробки, упаковать кошку, сказать слова прощания", Status.NEW);
         manager.addTask(task1);
@@ -63,9 +62,9 @@ public class Main {
         System.out.println(manager.getSubtasksOfEpic(epic1.getId()));
 
         // Удаление подзадачи, задачи и эпика по ID
-        manager.deleteSubtaskById(subtask1.getId());
-        manager.deleteTaskById(task1.getId());
-        manager.deleteEpicById(epic1.getId());
+        manager.removeSubtask(subtask1.getId());
+        manager.removeTask(task1.getId());
+        manager.removeEpic(epic1.getId());
 
         // Проверка удаления
         System.out.println("После удаления:");
@@ -94,11 +93,5 @@ public class Main {
         System.out.println("История просмотров:");
         System.out.println(manager.getHistory());
 
-        // Проверка, что в истории не более 10 элементов
-        if (manager.getHistory().size() <= 10) {
-            System.out.println("История содержит не более 10 элементов, как и ожидалось.");
-        } else {
-            System.out.println("Ошибка: История содержит более 10 элементов.");
-        }
     }
 }
