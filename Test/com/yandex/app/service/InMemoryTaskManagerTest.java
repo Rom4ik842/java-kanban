@@ -13,17 +13,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
     private TaskManager manager;
+    private Task task1;
+    private Task task2;
+    private Epic epic1;
+    private Epic epic2;
+    private Subtask subtask1;
+    private Subtask subtask2;
 
     @BeforeEach
     void setUp() {
         manager = Managers.getDefault();
+        task1 = new Task("Задача 1", "Описание 1", Status.NEW);
+        task2 = new Task("Задача 2", "Описание 2", Status.NEW);
+        epic1 = new Epic("Эпик 1", "Описание 1");
+        epic2 = new Epic("Эпик 2", "Описание 2");
+        subtask1 = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic1);
+        subtask2 = new Subtask("Подзадача 2", "Описание 2", Status.NEW, epic1);
     }
 
     @Test
     void testAddAndGetTasks() {
-        Task task1 = new Task("Задача 1", "Описание 1", Status.NEW);
-        Task task2 = new Task("Задача 2", "Описание 2", Status.NEW);
-
         manager.addTask(task1);
         manager.addTask(task2);
 
@@ -35,9 +44,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testAddAndGetEpics() {
-        Epic epic1 = new Epic("Эпик 1", "Описание 1");
-        Epic epic2 = new Epic("Эпик 2", "Описание 2");
-
         manager.addEpic(epic1);
         manager.addEpic(epic2);
 
@@ -49,11 +55,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testAddAndGetSubtasks() {
-        Epic epic1 = new Epic("Эпик 1", "Описание 1");
         manager.addEpic(epic1);
-
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic1);
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание 2", Status.NEW, epic1);
 
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
@@ -66,111 +68,95 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testRemoveSubtaskUpdatesEpic() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        manager.addEpic(epic);
-        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
-        manager.addSubtask(subtask);
+        manager.addEpic(epic1);
+        manager.addSubtask(subtask1);
 
-        manager.removeSubtask(subtask.getId());
+        manager.deleteSubtaskById(subtask1.getId());
 
         List<Subtask> subtasks = manager.getAllSubtasks();
         assertEquals(0, subtasks.size());
 
         List<Epic> epics = manager.getAllEpics();
-        assertEquals(Status.NEW, epic.getStatus());
+        assertEquals(Status.NEW, epic1.getStatus());
     }
 
     @Test
     void testEpicStatusUpdate() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        manager.addEpic(epic);
+        manager.addEpic(epic1);
 
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание 2", Status.DONE, epic);
+        subtask1.setStatus(Status.NEW);
+        subtask2.setStatus(Status.DONE);
 
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        assertEquals(Status.IN_PROGRESS, epic.getStatus());
+        assertEquals(Status.IN_PROGRESS, epic1.getStatus());
 
-        manager.removeSubtask(subtask1.getId());
-        assertEquals(Status.DONE, epic.getStatus());
+        manager.deleteSubtaskById(subtask1.getId());
+        assertEquals(Status.DONE, epic1.getStatus());
     }
 
     @Test
     void testEpicWithoutSubtasksIsNew() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        manager.addEpic(epic);
+        manager.addEpic(epic1);
 
-        assertEquals(Status.NEW, epic.getStatus());
+        assertEquals(Status.NEW, epic1.getStatus());
     }
 
     @Test
     void testGetEpicById() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        manager.addEpic(epic);
+        manager.addEpic(epic1);
 
-        Epic fetchedEpic = manager.getEpicById(epic.getId());
-        assertEquals(epic, fetchedEpic);
+        Epic fetchedEpic = manager.getEpicById(epic1.getId());
+        assertEquals(epic1, fetchedEpic);
     }
 
     @Test
     void testSubtaskDoesNotRetainOldIdAfterRemoval() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        manager.addEpic(epic);
+        manager.addEpic(epic1);
+        manager.addSubtask(subtask1);
 
-        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
-        manager.addSubtask(subtask);
-
-        int removedId = subtask.getId();
-        manager.removeSubtask(removedId);
+        int removedId = subtask1.getId();
+        manager.deleteSubtaskById(removedId);
 
         // Проверяем, что подзадача не хранит старый ID
-        assertThrows(IllegalArgumentException.class, () -> manager.getSubtaskById(removedId));
+        assertNull(manager.getSubtaskById(removedId));
     }
 
     @Test
     void testEpicDoesNotRetainOldSubtaskIds() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        manager.addEpic(epic);
-
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание 2", Status.NEW, epic);
+        manager.addEpic(epic1);
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        manager.removeSubtask(subtask1.getId());
+        manager.deleteSubtaskById(subtask1.getId());
 
         // Проверяем, что эпик не содержит ID удалённой подзадачи
-        assertFalse(epic.getSubtasks().contains(subtask1));
+        assertFalse(epic1.getSubtasks().contains(subtask1));
     }
 
     @Test
     void testTaskFieldUpdateAffectsManagerData() {
-        Task task = new Task("Задача 1", "Описание 1", Status.NEW);
-        manager.addTask(task);
+        manager.addTask(task1);
 
         // Изменяем название задачи
-        task.setTitle("Новая Задача");
+        task1.setTitle("Новая Задача");
 
-        Task updatedTask = manager.getTaskById(task.getId());
+        Task updatedTask = manager.getTaskById(task1.getId());
         assertEquals("Новая Задача", updatedTask.getTitle());
     }
 
     @Test
     void testSubtaskFieldUpdateAffectsEpic() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        manager.addEpic(epic);
-
-        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
-        manager.addSubtask(subtask);
+        manager.addEpic(epic1);
+        manager.addSubtask(subtask1);
 
         // Изменяем статус подзадачи
-        subtask.setStatus(Status.DONE);
+        subtask1.setStatus(Status.DONE);
 
-        manager.removeSubtask(subtask.getId());
+        manager.deleteSubtaskById(subtask1.getId());
 
         // Проверяем, что статус эпика обновился
-        assertEquals(Status.NEW, epic.getStatus());
+        assertEquals(Status.NEW, epic1.getStatus());
     }
 }

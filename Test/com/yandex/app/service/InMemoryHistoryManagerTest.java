@@ -11,17 +11,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
     private HistoryManager historyManager;
+    private Task task1;
+    private Task task2;
+    private Task task3;
 
     @BeforeEach
     void setUp() {
         historyManager = new InMemoryHistoryManager();
+        task1 = new Task("Задача 1", "Описание 1", Status.NEW);
+        task2 = new Task("Задача 2", "Описание 2", Status.NEW);
+        task3 = new Task("Задача 3", "Описание 3", Status.NEW);
+
+        task1.setId(1); // Устанавливаем ID для задач
+        task2.setId(2);
+        task3.setId(3);
     }
 
     @Test
     void testAddAndGetHistory() {
-        Task task1 = new Task("Задача 1", "Описание 1", Status.NEW);
-        Task task2 = new Task("Задача 2", "Описание 2", Status.NEW);
-
         historyManager.add(task1);
         historyManager.add(task2);
 
@@ -33,7 +40,6 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void testRemoveFromHistory() {
-        Task task1 = new Task("Задача 1", "Описание 1", Status.NEW);
         historyManager.add(task1);
         historyManager.remove(task1.getId());
 
@@ -43,7 +49,6 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void testDuplicateAdd() {
-        Task task1 = new Task("Задача 1", "Описание 1", Status.NEW);
         historyManager.add(task1);
         historyManager.add(task1); // Добавляем повторно
 
@@ -54,10 +59,6 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void testOrderOfHistory() {
-        Task task1 = new Task("Задача 1", "Описание 1", Status.NEW);
-        Task task2 = new Task("Задача 2", "Описание 2", Status.NEW);
-        Task task3 = new Task("Задача 3", "Описание 3", Status.NEW);
-
         historyManager.add(task1);
         historyManager.add(task2);
         historyManager.add(task3);
@@ -66,14 +67,12 @@ class InMemoryHistoryManagerTest {
         List<Task> history = historyManager.getHistory();
         assertEquals(3, history.size());
         assertEquals(task1, history.get(0));
-        assertEquals(task2, history.get(1));
-        assertEquals(task3, history.get(2));
+        assertEquals(task3, history.get(1));
+        assertEquals(task2, history.get(2));
     }
 
     @Test
     void testRemoveUpdatesHistory() {
-        Task task1 = new Task("Задача 1", "Описание 1", Status.NEW);
-        Task task2 = new Task("Задача 2", "Описание 2", Status.NEW);
         historyManager.add(task1);
         historyManager.add(task2);
 
