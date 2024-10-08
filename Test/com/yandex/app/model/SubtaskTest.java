@@ -1,14 +1,22 @@
 package com.yandex.app.model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SubtaskTest {
+    private Epic epic;
+    private Subtask subtask;
+
+    @BeforeEach
+    void setUp() {
+        epic = new Epic("Эпик 1", "Описание 1");
+        subtask = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
+    }
 
     @Test
     void testEquals() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
         Subtask subtask2 = new Subtask("Подзадача 2", "Описание 2", Status.NEW, epic);
         subtask1.setId(1);
@@ -19,7 +27,6 @@ class SubtaskTest {
 
     @Test
     void testNotEquals() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
         Subtask subtask2 = new Subtask("Подзадача 2", "Описание 2", Status.NEW, epic);
         subtask1.setId(1);
@@ -30,8 +37,24 @@ class SubtaskTest {
 
     @Test
     void testSetEpicToSelf() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", Status.NEW, epic);
-        assertThrows(IllegalArgumentException.class, () -> subtask.setEpic(epic)); // Исправление здесь
+        assertThrows(IllegalArgumentException.class, () -> subtask.setEpic(epic));
+    }
+
+    @Test
+    void testSetEpicToNull() {
+        assertThrows(IllegalArgumentException.class, () -> subtask.setEpic(null));
+    }
+
+    @Test
+    void testUpdateStatus() {
+        subtask.setStatus(Status.IN_PROGRESS);
+        assertEquals(Status.IN_PROGRESS, subtask.getStatus(), "Статус подзадачи должен быть обновлен.");
+    }
+
+    @Test
+    void testAddSubtaskToSelf() {
+        Subtask subtaskToSelf = new Subtask("Подзадача самому себе", "Описание", Status.NEW, epic);
+        subtaskToSelf.setId(epic.getId()); // Устанавливаем ID подзадачи равным ID эпика
+        assertThrows(IllegalArgumentException.class, () -> epic.addSubtask(subtaskToSelf));
     }
 }

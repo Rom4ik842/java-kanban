@@ -66,16 +66,4 @@ public interface TaskManager {
 
     // Получение истории просмотров задач
     List<Task> getHistory();
-
-    // Удаление подзадачи по ID
-    void removeSubtask(int id);
-
-    // Удаление задачи по ID
-    void removeTask(int id);
-
-    // Удаление эпика по ID
-    void removeEpic(int id);
-
-    // Получение версий задачи по ID
-    List<Task> getTaskVersions(int taskId);
 }

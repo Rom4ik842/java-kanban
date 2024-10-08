@@ -6,68 +6,46 @@ import java.util.List;
 public class Epic extends Task {
     private final List<Subtask> subtasks;
 
-    public Epic(String name, String description) {
-        super(name, description, Status.NEW);
+    public Epic(String title, String description) {
+        super(title, description, Status.NEW);
         this.subtasks = new ArrayList<>();
     }
 
+    public List<Subtask> getSubtasks() {
+        return subtasks;
+    }
+
     public void addSubtask(Subtask subtask) {
-        // Устанавливаем текущий эпик для подзадачи, если это не тот же самый эпик
-        if (subtask.getEpic() == null) {
-            subtask.setEpic(this); // Устанавливаем текущий эпик для подзадачи
-            subtasks.add(subtask);
-            updateStatus(); // Обновляем статус эпика после добавления подзадачи
-        } else if (subtask.getEpic() != this) {
-            throw new IllegalArgumentException("Подзадача не может быть добавлена сама по себе.");
+        if (subtask.getEpic() != this) {
+            throw new IllegalArgumentException("Подзадача не принадлежит этому эпику");
         }
+        if (subtask.getId() == this.getId()) {
+            throw new IllegalArgumentException("Эпик не может быть добавлен как подзадача самому себе");
+        }
+        subtasks.add(subtask);
+        updateStatus();
     }
 
     public void removeSubtask(int subtaskId) {
-        // Удаляем подзадачу по ее ID
         subtasks.removeIf(subtask -> subtask.getId() == subtaskId);
-        updateStatus(); // Обновляем статус эпика после удаления подзадачи
-    }
-
-    public List<Subtask> getSubtasks() {
-        return new ArrayList<>(subtasks); // Возвращаем копию списка подзадач
+        updateStatus();
     }
 
     public void updateStatus() {
-        // Обновление статуса эпика в зависимости от статусов подзадач
         if (subtasks.isEmpty()) {
             setStatus(Status.NEW);
             return;
         }
 
-        boolean allDone = true;
-        boolean anyInProgress = false;
+        boolean allNew = subtasks.stream().allMatch(subtask -> subtask.getStatus() == Status.NEW);
+        boolean allDone = subtasks.stream().allMatch(subtask -> subtask.getStatus() == Status.DONE);
 
-        for (Subtask subtask : subtasks) {
-            if (subtask.getStatus() != Status.DONE) {
-                allDone = false;
-            }
-            if (subtask.getStatus() == Status.IN_PROGRESS) {
-                anyInProgress = true;
-            }
-        }
-
-        if (allDone) {
-            setStatus(Status.DONE);
-        } else if (anyInProgress) {
-            setStatus(Status.IN_PROGRESS);
-        } else {
+        if (allNew) {
             setStatus(Status.NEW);
+        } else if (allDone) {
+            setStatus(Status.DONE);
+        } else {
+            setStatus(Status.IN_PROGRESS);
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Epic{" +
-                "id=" + getId() +
-                ", title='" + getTitle() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", status=" + getStatus() +
-                ", subtasks=" + subtasks +
-                '}';
     }
 }

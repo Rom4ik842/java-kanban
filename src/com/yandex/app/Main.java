@@ -62,9 +62,9 @@ public class Main {
         System.out.println(manager.getSubtasksOfEpic(epic1.getId()));
 
         // Удаление подзадачи, задачи и эпика по ID
-        manager.removeSubtask(subtask1.getId());
-        manager.removeTask(task1.getId());
-        manager.removeEpic(epic1.getId());
+        manager.deleteSubtaskById(subtask1.getId());
+        manager.deleteTaskById(task1.getId());
+        manager.deleteEpicById(epic1.getId());
 
         // Проверка удаления
         System.out.println("После удаления:");
@@ -92,6 +92,5 @@ public class Main {
         // Вывод истории просмотров
         System.out.println("История просмотров:");
         System.out.println(manager.getHistory());
-
     }
 }

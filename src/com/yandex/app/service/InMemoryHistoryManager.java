@@ -2,19 +2,10 @@ package com.yandex.app.service;
 
 import com.yandex.app.model.Task;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InMemoryHistoryManager implements HistoryManager {
-
-    // Узел двусвязного списка
-    private static class Node {
-        Task task;
-        Node prev;
-        Node next;
-
-        Node(Task task) {
-            this.task = task;
-        }
-    }
 
     private Node head;  // Начало списка
     private Node tail;  // Конец списка
@@ -50,11 +41,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     // Возвращает историю задач в виде списка
     @Override
     public List<Task> getHistory() {
-        List<Task> history = new ArrayList<>();
-        for (Node current = head; current != null; current = current.next) {
-            history.add(current.task);
-        }
-        return history;
+        return Stream.iterate(head, Objects::nonNull, node -> node.next)
+                .map(node -> node.task)
+                .collect(Collectors.toList());
     }
 
     // Приватные методы для работы с двусвязным списком
